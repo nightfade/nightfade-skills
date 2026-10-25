@@ -6,6 +6,7 @@
 |---|---|
 | dida-tasks | 维护滴答清单里的一个看板，收纳杂乱想法和待办 |
 | dida-jot | 把零散想法整理通顺、自动分类后记进滴答的笔记清单 |
+| brainstorming-zh | 中文版头脑风暴：通过结构化对话把模糊想法磨成可执行的设计，不限于代码 |
 | annie-decide | 按 Annie Duke 的决策体系带着做决定、写记录、复盘 |
 | share-html | 把 HTML 加密后发布到 Cloudflare Pages，生成带密码的链接 |
 | md2pdf | Markdown 转出版风格 PDF（XeLaTeX，支持书籍版式，图表本地转 TikZ，完全离线） |
