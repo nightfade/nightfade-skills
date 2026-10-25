@@ -1,0 +1,56 @@
+% --book 版式，经 pandoc -H 叠加在 template.tex 之后。
+% book.lua 已把唯一的 H1 做成封面并把其余标题上提一级，因此：
+%   ##      -> \section        整页起，深棕色通栏色块
+%   ###     -> \subsection     左侧色条 + 细下划线
+%   ####    -> \subsubsection  棕色粗体
+%   #####   -> \paragraph      独立成行，方块引导
+%   ######  -> \subparagraph   行内棕色粗体
+% 文档有多个 H1 时不上提，# 即 \section，依此类推。
+\definecolor{partcolor}{HTML}{6b4423}
+\definecolor{chapterrule}{HTML}{d9c9ae}
+
+\newcommand{\partbox}[1]{%
+  \colorbox{partcolor}{\parbox{\dimexpr\linewidth-2\fboxsep\relax}{%
+    \vspace{0.55em}\hspace{0.4em}#1\vspace{0.45em}}}}
+\newcommand{\chapterbar}[1]{%
+  \textcolor{h3color}{\rule[-0.3ex]{5pt}{1.05em}}\hspace{0.55em}#1}
+\newcommand{\nodemark}{%
+  \textcolor{h3color}{\rule[0.12ex]{0.5em}{0.5em}}\hspace{0.45em}}
+
+\newcommand{\sectionbreak}{\clearpage}
+\titleformat{\section}[block]
+  {\headingfont\huge\bfseries\color{white}}{}{0pt}{\partbox}
+\titleformat{\subsection}[block]
+  {\headingfont\LARGE\bfseries\color{h1color}}{}{0pt}{\chapterbar}
+  [\vspace{0.15em}{\color{chapterrule}\titlerule[0.6pt]}]
+\titleformat{\subsubsection}
+  {\headingfont\Large\bfseries\color{h3color}}{}{0pt}{}
+\titleformat{\paragraph}[block]
+  {\headingfont\large\bfseries\color{h4color}}{}{0pt}{\nodemark}
+\titleformat{\subparagraph}[runin]
+  {\normalsize\bfseries\color{h3color}}{}{0pt}{}[\hspace{0.6em}]
+
+\titlespacing*{\section}{0pt}{0pt}{1.4em}
+\titlespacing*{\subsection}{0pt}{1.8em}{0.9em}
+\titlespacing*{\subsubsection}{0pt}{1.3em}{0.5em}
+\titlespacing*{\paragraph}{0pt}{1.0em}{0.35em}
+\titlespacing*{\subparagraph}{0pt}{0.6em}{0pt}
+
+% 目录：section 加粗着色，其余缩进
+\usepackage{tocloft}
+\renewcommand{\cftsecfont}{\bfseries\color{partcolor}}
+\renewcommand{\cftsecpagefont}{\bfseries\color{partcolor}}
+\setlength{\cftbeforesecskip}{0.9em}
+\renewcommand{\cfttoctitlefont}{\headingfont\huge\bfseries}
+
+% 封面
+\newcommand{\bookcover}[2]{%
+  \begin{titlepage}
+    \vspace*{0.28\textheight}
+    {\color{partcolor}\rule{\linewidth}{1.2pt}}\par\vspace{1.2em}
+    {\headingfont\Huge\bfseries\color{h1color}#1\par}
+    \vspace{1.2em}{\color{partcolor}\rule{\linewidth}{0.4pt}}\par\vspace{1.4em}
+    {\large\color{h4color}#2\par}
+  \end{titlepage}}
+\renewcommand{\contentsname}{目录}
+\newunicodechar{✔}{\textfallback{✔}}

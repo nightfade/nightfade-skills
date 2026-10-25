@@ -1,0 +1,489 @@
+\documentclass[11pt,a4paper]{article}
+
+% CJK support
+% Bold maps to Heiti (黑体) rather than a bold Songti: Chinese convention is
+% 宋体正文 + 黑体强调, and without this `**bold**` and table headers are
+% visually indistinguishable from body text.
+\usepackage{xeCJK}
+\setCJKmainfont{Songti SC}[BoldFont={Heiti SC Medium}]
+\setCJKsansfont{Heiti SC Medium}
+% 代码块/等宽字体：Sarasa Fixed SC（等宽更纱黑体 Fixed 变体）
+% - CJK 与 ASCII = 2:1 严格等宽，框图与中文混排不会横向错位
+% - Fixed 变体的 box-drawing 字符（─│┌┐└┘）撑满字符格，相邻 │ 上下无缝拼接
+%   （普通 Sarasa Mono SC 的 box-drawing 设计高度只占 ~70%，方框看起来会断）
+% 未安装时回落到 Heiti SC + Menlo + Arial Unicode MS，照常出 PDF，只是框图可能错位。
+\IfFontExistsTF{Sarasa Fixed SC}{%
+  \newcommand{\monofontname}{Sarasa Fixed SC}%
+  \newcommand{\cjkmonofontname}{Sarasa Fixed SC}%
+  \newcommand{\symbolfontname}{Sarasa Fixed SC}%
+}{%
+  \newcommand{\monofontname}{Menlo}%
+  \newcommand{\cjkmonofontname}{Heiti SC}%
+  \newcommand{\symbolfontname}{Arial Unicode MS}%
+}
+\setCJKmonofont{\cjkmonofontname}
+\xeCJKsetup{CJKmath=true}
+
+% Box-drawing 与箭头字符（│ ─ ┌ ┐ └ ┘ ├ ┤ ┬ ┴ ┼ → ↑ 等）的 Unicode East Asian
+% Width 属性是 "Ambiguous"（A），xeCJK 默认按 CJK 宽度（=2 ASCII）渲染。这导致作者
+% 在等宽编辑器（按 1 ASCII 宽画图）里画的 ASCII art 在 PDF 里宽度被翻倍，各列错位。
+% 把它们归类为 Default（西文）就按 1 ASCII 宽渲染，各列对齐。
+%
+% 注意：
+%  (1) 必须用 Default 类，不要用 HalfLeft（HalfLeft 是给"半角左/右标点"用的，
+%      仍会注入 CJK 间距胶水，导致字符间额外加宽 ~16%）。
+%  (2) **不要把 × 加到 Default 类**：作者在中文 markdown 里画 ASCII art 时，× 通常
+%      被当作全宽汉字宽度算（如 `×N` 占 1 个汉字 = 2 ASCII），加到 Default 后会变
+%      半宽，反而让该行总宽变短 ~15px，破坏对齐。让 × 走 xeCJK CJK 类（默认全宽）。
+%  (3) 归入 Default 后这些字符改用当前西文字体；Palatino 没有箭头和几何符号，
+%      所以下面 newunicodechar 把它们显式交给 \textsymbol（Sarasa Fixed SC）。
+\xeCJKDeclareCharClass{Default}{
+  `│, `─, `┌, `┐, `└, `┘, `├, `┤, `┬, `┴, `┼,
+  `═, `║, `╔, `╗, `╚, `╝, `╠, `╣, `╦, `╩, `╬,
+  `╭, `╮, `╯, `╰,
+  `→, `←, `↑, `↓, `↔, `↕,
+  `▲, `▼, `◀, `▶, `△, `▽, `◁, `▷,
+  `●, `○, `■, `□, `◆, `◇, `★, `☆
+}
+
+% Western fonts (v2 style: Palatino + Baskerville)
+\usepackage{fontspec}
+\setmainfont{Palatino}[
+  BoldFont = Palatino Bold,
+  ItalicFont = Palatino Italic,
+  BoldItalicFont = Palatino Bold Italic,
+]
+\IfFontExistsTF{Sarasa Fixed SC}
+  {\setmonofont{Sarasa Fixed SC}}
+  {\setmonofont{Menlo}[Scale=0.85]}
+\newfontfamily\headingfont{Baskerville}
+
+% Math
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{unicode-math}
+
+% Unicode fallback
+\usepackage{newunicodechar}
+\newfontfamily{\fallbackfont}{Arial Unicode MS}
+\DeclareTextFontCommand{\textfallback}{\fallbackfont}
+% 箭头、几何符号的 fallback：Sarasa Fixed SC 而非 Arial Unicode MS。Arial 的箭头是
+% 全宽 1em，会破坏 verbatim 对齐；Sarasa 的 → ← 宽度与正文协调，verbatim 里也按
+% 半宽（width=500）对齐。Sarasa 缺失时 \symbolfontname 已回落到 Arial Unicode MS。
+\newfontfamily{\symbolfont}{\symbolfontname}
+\DeclareTextFontCommand{\textsymbol}{\symbolfont}
+\newunicodechar{𝛴}{\textfallback{Σ}}
+\newunicodechar{𝛬}{\textfallback{Λ}}
+\newunicodechar{∼}{\ensuremath{\sim}}
+\newunicodechar{→}{\textsymbol{→}}
+\newunicodechar{←}{\textsymbol{←}}
+\newunicodechar{↔}{\textsymbol{↔}}
+\newunicodechar{↑}{\textsymbol{↑}}
+\newunicodechar{↓}{\textsymbol{↓}}
+\newunicodechar{↕}{\textsymbol{↕}}
+\newunicodechar{▲}{\textsymbol{▲}}
+\newunicodechar{▼}{\textsymbol{▼}}
+\newunicodechar{◀}{\textsymbol{◀}}
+\newunicodechar{▶}{\textsymbol{▶}}
+\newunicodechar{△}{\textsymbol{△}}
+\newunicodechar{▽}{\textsymbol{▽}}
+\newunicodechar{◁}{\textsymbol{◁}}
+\newunicodechar{▷}{\textsymbol{▷}}
+\newunicodechar{●}{\textsymbol{●}}
+\newunicodechar{○}{\textsymbol{○}}
+\newunicodechar{■}{\textsymbol{■}}
+\newunicodechar{□}{\textsymbol{□}}
+\newunicodechar{◆}{\textsymbol{◆}}
+\newunicodechar{◇}{\textsymbol{◇}}
+\newunicodechar{⇒}{\textfallback{⇒}}
+\newunicodechar{⇐}{\textfallback{⇐}}
+\newunicodechar{≈}{\ensuremath{\approx}}
+\newunicodechar{≤}{\ensuremath{\leq}}
+\newunicodechar{≥}{\ensuremath{\geq}}
+\newunicodechar{≠}{\ensuremath{\neq}}
+\newunicodechar{★}{\textsymbol{★}}
+\newunicodechar{☆}{\textsymbol{☆}}
+% Math symbols not in Palatino — render via math mode for proper glyphs
+\newunicodechar{∝}{\ensuremath{\propto}}
+\newunicodechar{∈}{\ensuremath{\in}}
+\newunicodechar{∉}{\ensuremath{\notin}}
+\newunicodechar{∋}{\ensuremath{\ni}}
+\newunicodechar{∀}{\ensuremath{\forall}}
+\newunicodechar{∃}{\ensuremath{\exists}}
+\newunicodechar{∞}{\ensuremath{\infty}}
+\newunicodechar{∅}{\ensuremath{\emptyset}}
+\newunicodechar{∂}{\ensuremath{\partial}}
+\newunicodechar{∇}{\ensuremath{\nabla}}
+\newunicodechar{∑}{\ensuremath{\sum}}
+\newunicodechar{∏}{\ensuremath{\prod}}
+\newunicodechar{∫}{\ensuremath{\int}}
+\newunicodechar{√}{\ensuremath{\sqrt{}}}
+\newunicodechar{±}{\ensuremath{\pm}}
+\newunicodechar{∓}{\ensuremath{\mp}}
+% 不映射 × 到 \ensuremath{\times}：会让 verbatim 里的 × 渲染成数学符号宽度，与
+% mono 字体其他字符宽不一致，破坏 ASCII art 对齐。让 × 走 fontspec 路径用 Palatino
+% （正文）或 Sarasa Fixed SC（verbatim）的字面 × glyph。
+\newunicodechar{÷}{\ensuremath{\div}}
+\newunicodechar{⋅}{\ensuremath{\cdot}}
+\newunicodechar{≡}{\ensuremath{\equiv}}
+\newunicodechar{∨}{\ensuremath{\vee}}
+\newunicodechar{∧}{\ensuremath{\wedge}}
+\newunicodechar{⊂}{\ensuremath{\subset}}
+\newunicodechar{⊃}{\ensuremath{\supset}}
+\newunicodechar{⊆}{\ensuremath{\subseteq}}
+\newunicodechar{⊇}{\ensuremath{\supseteq}}
+\newunicodechar{∪}{\ensuremath{\cup}}
+\newunicodechar{∩}{\ensuremath{\cap}}
+\newunicodechar{⟹}{\ensuremath{\implies}}
+\newunicodechar{⟸}{\ensuremath{\impliedby}}
+\newunicodechar{⟺}{\ensuremath{\iff}}
+\newunicodechar{−}{\ensuremath{-}}
+% Greek letters not in Palatino — render via math mode
+\newunicodechar{α}{\ensuremath{\alpha}}
+\newunicodechar{β}{\ensuremath{\beta}}
+\newunicodechar{γ}{\ensuremath{\gamma}}
+\newunicodechar{δ}{\ensuremath{\delta}}
+\newunicodechar{ε}{\ensuremath{\epsilon}}
+\newunicodechar{ζ}{\ensuremath{\zeta}}
+\newunicodechar{η}{\ensuremath{\eta}}
+\newunicodechar{θ}{\ensuremath{\theta}}
+\newunicodechar{ι}{\ensuremath{\iota}}
+\newunicodechar{κ}{\ensuremath{\kappa}}
+\newunicodechar{λ}{\ensuremath{\lambda}}
+\newunicodechar{μ}{\ensuremath{\mu}}
+\newunicodechar{ν}{\ensuremath{\nu}}
+\newunicodechar{ξ}{\ensuremath{\xi}}
+\newunicodechar{π}{\ensuremath{\pi}}
+\newunicodechar{ρ}{\ensuremath{\rho}}
+\newunicodechar{σ}{\ensuremath{\sigma}}
+\newunicodechar{τ}{\ensuremath{\tau}}
+\newunicodechar{υ}{\ensuremath{\upsilon}}
+\newunicodechar{φ}{\ensuremath{\phi}}
+\newunicodechar{χ}{\ensuremath{\chi}}
+\newunicodechar{ψ}{\ensuremath{\psi}}
+\newunicodechar{ω}{\ensuremath{\omega}}
+\newunicodechar{Α}{\ensuremath{\mathrm{A}}}
+\newunicodechar{Β}{\ensuremath{\mathrm{B}}}
+\newunicodechar{Γ}{\ensuremath{\Gamma}}
+\newunicodechar{Δ}{\ensuremath{\Delta}}
+\newunicodechar{Θ}{\ensuremath{\Theta}}
+\newunicodechar{Λ}{\ensuremath{\Lambda}}
+\newunicodechar{Ξ}{\ensuremath{\Xi}}
+\newunicodechar{Π}{\ensuremath{\Pi}}
+\newunicodechar{Σ}{\ensuremath{\Sigma}}
+\newunicodechar{Φ}{\ensuremath{\Phi}}
+\newunicodechar{Ψ}{\ensuremath{\Psi}}
+\newunicodechar{Ω}{\ensuremath{\Omega}}
+% Sub/super-scripts not in Palatino — math mode equivalents
+\newunicodechar{⁰}{\ensuremath{^{0}}}
+\newunicodechar{¹}{\ensuremath{^{1}}}
+\newunicodechar{²}{\ensuremath{^{2}}}
+\newunicodechar{³}{\ensuremath{^{3}}}
+\newunicodechar{⁴}{\ensuremath{^{4}}}
+\newunicodechar{⁵}{\ensuremath{^{5}}}
+\newunicodechar{⁶}{\ensuremath{^{6}}}
+\newunicodechar{⁷}{\ensuremath{^{7}}}
+\newunicodechar{⁸}{\ensuremath{^{8}}}
+\newunicodechar{⁹}{\ensuremath{^{9}}}
+\newunicodechar{⁻}{\ensuremath{^{-}}}
+\newunicodechar{₀}{\ensuremath{_{0}}}
+\newunicodechar{₁}{\ensuremath{_{1}}}
+\newunicodechar{₂}{\ensuremath{_{2}}}
+\newunicodechar{₃}{\ensuremath{_{3}}}
+\newunicodechar{₄}{\ensuremath{_{4}}}
+% ↑ ↓ 已在前面 newunicodechar 块统一映射到 \textsymbol。
+% Latin supplement / extended characters used in proper names (Erdős, Barabási, ...)
+\newunicodechar{á}{\textfallback{á}}
+\newunicodechar{à}{\textfallback{à}}
+\newunicodechar{â}{\textfallback{â}}
+\newunicodechar{ä}{\textfallback{ä}}
+\newunicodechar{é}{\textfallback{é}}
+\newunicodechar{è}{\textfallback{è}}
+\newunicodechar{ê}{\textfallback{ê}}
+\newunicodechar{ë}{\textfallback{ë}}
+\newunicodechar{í}{\textfallback{í}}
+\newunicodechar{ì}{\textfallback{ì}}
+\newunicodechar{î}{\textfallback{î}}
+\newunicodechar{ï}{\textfallback{ï}}
+\newunicodechar{ó}{\textfallback{ó}}
+\newunicodechar{ò}{\textfallback{ò}}
+\newunicodechar{ô}{\textfallback{ô}}
+\newunicodechar{ö}{\textfallback{ö}}
+\newunicodechar{ő}{\textfallback{ő}}
+\newunicodechar{ú}{\textfallback{ú}}
+\newunicodechar{ù}{\textfallback{ù}}
+\newunicodechar{û}{\textfallback{û}}
+\newunicodechar{ü}{\textfallback{ü}}
+\newunicodechar{ű}{\textfallback{ű}}
+\newunicodechar{ñ}{\textfallback{ñ}}
+\newunicodechar{ç}{\textfallback{ç}}
+% Circled numbers used in Chinese outlines (Palatino has none of these)
+\newunicodechar{①}{\textfallback{①}}
+\newunicodechar{②}{\textfallback{②}}
+\newunicodechar{③}{\textfallback{③}}
+\newunicodechar{④}{\textfallback{④}}
+\newunicodechar{⑤}{\textfallback{⑤}}
+\newunicodechar{⑥}{\textfallback{⑥}}
+\newunicodechar{⑦}{\textfallback{⑦}}
+\newunicodechar{⑧}{\textfallback{⑧}}
+\newunicodechar{⑨}{\textfallback{⑨}}
+\newunicodechar{⑩}{\textfallback{⑩}}
+\newunicodechar{⑪}{\textfallback{⑪}}
+\newunicodechar{⑫}{\textfallback{⑫}}
+\newunicodechar{⑬}{\textfallback{⑬}}
+\newunicodechar{⑭}{\textfallback{⑭}}
+\newunicodechar{⑮}{\textfallback{⑮}}
+\newunicodechar{⑯}{\textfallback{⑯}}
+\newunicodechar{⑰}{\textfallback{⑰}}
+\newunicodechar{⑱}{\textfallback{⑱}}
+\newunicodechar{⑲}{\textfallback{⑲}}
+\newunicodechar{⑳}{\textfallback{⑳}}
+% Box-drawing characters: 不要在这里映射到 \textfallback——会强制用 Arial Unicode MS
+% 渲染（其 box-drawing 是全宽 1em），导致 ASCII art 各行宽度不一致而错位。
+% 让它们走 xeCJK 正常路径 → mono 字体（Sarasa Fixed SC，字符宽 500 = 半宽 = 对齐）。
+% 通过 \xeCJKDeclareCharClass{Default}（在 xeCJK 块中声明）让 xeCJK 不注入 CJK 间距胶水。
+
+% Page layout
+\usepackage[top=2.1cm,bottom=2cm,left=2.2cm,right=2.2cm,headsep=0.35cm,footskip=1cm]{geometry}
+
+% Headers and footers — page number lives in the header only, and the header
+% carries no rule; both are pure ink with no information value per page.
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\itshape\leftmark}
+\fancyhead[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0pt}
+
+% Colors (v2 warm beige palette)
+% The `table` option pulls in colortbl, needed for zebra-striped table rows.
+\usepackage[table]{xcolor}
+\definecolor{h1color}{HTML}{1a1a1a}
+\definecolor{h2color}{HTML}{222222}
+\definecolor{h3color}{HTML}{8b5a2b}
+\definecolor{h4color}{HTML}{444444}
+\definecolor{quotebg}{HTML}{f6f3ec}
+\definecolor{quotestroke}{HTML}{8b6f47}
+\definecolor{quotetext}{HTML}{3a3128}
+\definecolor{tablestripe}{HTML}{f4f1e9}
+% TikZ palette (warm tones consistent with body style)
+\definecolor{tikzboxfill}{HTML}{e8e0d0}
+\definecolor{tikzboxstroke}{HTML}{8b6f47}
+\definecolor{tikzaccent}{HTML}{8b5a2b}
+\definecolor{tikzaccept}{HTML}{c8d6b9}
+\definecolor{tikzreject}{HTML}{e8c4b8}
+\definecolor{tikzdecision}{HTML}{f4d9a4}
+\definecolor{codeinlinefill}{HTML}{f0ede5}
+\definecolor{codeinlinetext}{HTML}{8b3a3a}
+\definecolor{linkcolor}{HTML}{6b4423}
+
+% Section styling (v2 风格的标题)
+% Hierarchy comes from size, weight and colour — no rules under headings, so a
+% document with many `##` sections does not turn into a stack of lines.
+\usepackage{titlesec}
+\titleformat{\section}{\headingfont\LARGE\color{h1color}}{\thesection}{1em}{}
+\titleformat{\subsection}{\headingfont\Large\color{h2color}\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\headingfont\large\color{h3color}\bfseries}{\thesubsubsection}{1em}{}
+\titleformat{\paragraph}[runin]{\headingfont\normalsize\color{h4color}\bfseries}{}{0pt}{}
+\titlespacing*{\section}{0pt}{1.5em}{0.7em}
+\titlespacing*{\subsection}{0pt}{1.1em}{0.45em}
+\titlespacing*{\subsubsection}{0pt}{0.85em}{0.35em}
+\titlespacing*{\paragraph}{0pt}{0.6em}{0.6em}
+
+% TOC
+\setcounter{tocdepth}{$if(toc-depth)$$toc-depth$$else$2$endif$}
+
+% Hyperlinks (warm tone)
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=linkcolor,
+  urlcolor=linkcolor,
+  citecolor=linkcolor,
+}
+
+% Code blocks
+\usepackage{fancyvrb}
+\usepackage{framed}
+\definecolor{shadecolor}{HTML}{f0ede5}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\},fontsize=\small}
+% pandoc 对无语言标签的代码块（ASCII 框图）用 LaTeX 内置 \verbatim。重定义为 fancyvrb
+% 的 Verbatim 并：
+%  (a) 强制收紧行距，让 │ 上下闭合
+%  (b) 在 verbatim 内把 CJK 字体临时改为 mono 字体——否则 box-drawing 字符
+%      因为 xeCJK 字体回落机制会被 Songti SC（CJK main）渲染（Songti SC 的 ─ 是
+%      1000 单位 = 全宽），即使已经用 \xeCJKDeclareCharClass{Default} 归类为西文也
+%      没用。box-drawing 字符各行宽度因此不一致，方框右边对不齐。
+%  关键坑：fancyvrb 的 baselinestretch=N 选项实际不影响行距；setstretch 在文档已
+%  有 \setstretch 时被覆盖；必须用 \renewcommand{\baselinestretch}{0.85} 直接
+%  重设原始变量，这条在 verbatim 局部环境里能正确传递到 \baselineskip。
+% 预定义一个 mono CJK font family，verbatim 内用它而不是 \setCJKmainfont（后者是
+% preamble-only 命令，在环境内调用会触发 "Can be used only in preamble" 错误）。
+\newCJKfontfamily\verbatimcjkfont{\cjkmonofontname}
+
+\RecustomVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\small,formatcom=\renewcommand{\baselinestretch}{0.85}\verbatimcjkfont\selectfont}
+
+% asciiart 环境：专门用于 ```` ```ascii ```` 代码块（含 box-drawing 字符的 ASCII 流程图）。
+% 行距压到 0.6 让相邻 │ 上下尽量贴近（默认 0.85 缝隙更明显；0.6 是 fancyvrb 实际能
+% 压到的下限——再小也不会改变像素结果，因为 Sarasa Fixed SC 的 │ glyph 顶部留
+% ~5% padding，最后 ~5px 的视觉缝隙是字体设计决定的）。preprocess.py 把无语言标签、
+% 含 box-drawing 字符的块标成 ```` ```ascii ````，tikz.lua 再包装成 asciiart。
+\DefineVerbatimEnvironment{asciiart}{Verbatim}{fontsize=\small,formatcom=\renewcommand{\baselinestretch}{0.6}\verbatimcjkfont\selectfont}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.65,0.16,0.16}{\textbf{#1}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.43,0.36,0.27}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.49,0.36,0.16}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.35,0.43,0.24}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.55,0.34,0.10}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.35,0.34,0.43}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.55,0.45,0.35}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.55,0.45,0.35}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.55,0.20,0.10}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.55,0.34,0.10}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.35,0.43,0.24}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.65,0.20,0.20}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.85,0.15,0.15}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.35,0.43,0.24}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.20,0.30,0.50}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.30,0.50,0.30}{\textbf{#1}}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.45,0.50,0.55}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.55,0.34,0.10}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.40,0.40,0.40}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.40,0.50,0.30}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.74,0.48,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.35,0.34,0.43}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.55,0.30,0.40}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.40,0.45,0.55}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.20,0.20,0.50}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.40,0.45,0.55}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.55,0.45,0.35}{\textbf{\textit{#1}}}}
+
+% Inline code (v2 style: pink-brown text on warm beige)
+\let\oldtexttt\texttt
+\renewcommand{\texttt}[1]{{\colorbox{codeinlinefill}{\textcolor{codeinlinetext}{\oldtexttt{#1}}}}}
+
+% Quote / blockquote (v2 style: warm beige bg + brown stroke + italic)
+\usepackage{tcolorbox}
+\tcbuselibrary{breakable}
+\newtcolorbox{quotebox}{
+  colback=quotebg,
+  colframe=quotestroke,
+  boxrule=0pt,
+  leftrule=2pt,
+  arc=0pt,
+  outer arc=0pt,
+  left=12pt, right=10pt, top=4pt, bottom=4pt,
+  before skip=6pt, after skip=6pt,
+  breakable,
+}
+\renewenvironment{quote}{\begin{quotebox}\itshape\color{quotetext}}{\end{quotebox}}
+
+% Tables
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{multirow}
+\newcounter{none}
+% Body leading is set for prose; inside a table it just makes rows tall.
+% Zebra striping instead of per-row rules: cells here routinely wrap to 2-4
+% lines, and with booktabs' three rules alone the rows read as one text block.
+% A background band costs no vertical space and adds no rule.
+\usepackage{etoolbox}
+\newcommand{\tablelayout}{%
+  \setstretch{1.08}%
+  \setlength{\extrarowheight}{2pt}%
+  \rowcolors{2}{}{tablestripe}%
+}
+\AtBeginEnvironment{longtable}{\tablelayout}
+\AtBeginEnvironment{tabular}{\tablelayout}
+\setlength{\LTpre}{0.6em}
+\setlength{\LTpost}{0.6em}
+
+% Graphics
+\usepackage{graphicx}
+\usepackage{adjustbox}
+% Pandoc 3.2+ requires \pandocbounded for sized image insertion.
+% Uses adjustbox's max size to preserve aspect ratio while bounding both width and height.
+\providecommand{\pandocbounded}[1]{%
+  \begin{center}%
+  \adjustbox{max width=\linewidth, max height=0.85\textheight, keepaspectratio}{#1}%
+  \end{center}}
+
+% TikZ + commonly useful libraries（Mermaid 转换后的图和手写 ```tikz 块都靠它）
+\usepackage{tikz}
+\usetikzlibrary{
+  arrows.meta,
+  positioning,
+  shapes.geometric,
+  shapes.misc,
+  shapes.symbols,
+  shapes.callouts,
+  calc,
+  fit,
+  backgrounds,
+  decorations.pathreplacing,
+  decorations.pathmorphing,
+  decorations.markings,
+  patterns,
+  patterns.meta,
+  matrix,
+  chains,
+  trees,
+  mindmap,
+  3d,
+  through,
+  intersections,
+  quotes,
+  angles,
+}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{fillbetween, groupplots, statistics, dateplot}
+% TikZ figure environment: centered, bounded to the text block
+\newenvironment{tikzfigure}{%
+  \begin{center}%
+  \begin{adjustbox}{max width=\linewidth, max height=0.85\textheight, keepaspectratio}%
+}{%
+  \end{adjustbox}%
+  \end{center}%
+}
+
+% Tight list
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+% Section numbering off
+\setcounter{secnumdepth}{0}
+
+% Line spacing — 1.28 stays comfortable for mixed CJK/Latin while fitting
+% roughly six more lines per A4 page than the old 1.45.
+\usepackage{setspace}
+\setstretch{1.28}
+
+% Paragraph spacing — blank line between paragraphs, so no first-line indent
+\setlength{\parskip}{0.35em}
+\setlength{\parindent}{0pt}
+
+% Prevent overfull hbox
+\setlength{\emergencystretch}{3em}
+\tolerance=1000
+
+% 文档自带的导言区代码（YAML header-includes），未设置时为空
+$for(header-includes)$
+$header-includes$
+$endfor$
+
+\begin{document}
+
+$if(toc)$
+\tableofcontents
+\newpage
+$endif$
+
+$body$
+
+\end{document}

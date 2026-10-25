@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>受保护的文档</title>
+<style>
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+         font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+         background: #f4f4f5; color: #18181b; }
+  form { background: #fff; padding: 32px 28px; border-radius: 12px; width: min(340px, 86vw);
+         box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.06); }
+  h1 { font-size: 18px; margin: 0 0 6px; }
+  p { font-size: 14px; color: #71717a; margin: 0 0 20px; }
+  input { box-sizing: border-box; width: 100%; font-size: 16px; padding: 10px 12px;
+          border: 1px solid #d4d4d8; border-radius: 8px; outline: none; }
+  input:focus { border-color: #2563eb; }
+  button { margin-top: 12px; width: 100%; font-size: 16px; padding: 10px; border: 0;
+           border-radius: 8px; background: #2563eb; color: #fff; cursor: pointer; }
+  button:disabled { opacity: .6; cursor: default; }
+  #err { color: #dc2626; font-size: 14px; min-height: 20px; margin-top: 10px; }
+</style>
+</head>
+<body>
+<form id="f">
+  <h1>这份文档需要密码</h1>
+  <p>输入分享者给你的密码</p>
+  <input id="pw" type="password" autocomplete="off" autofocus placeholder="密码">
+  <button id="btn" type="submit">打开</button>
+  <div id="err"></div>
+</form>
+<script>
+const P = /*PAYLOAD*/null;
+const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+
+async function unlock(pw) {
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveKey"]);
+  const key = await crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt: b64(P.salt), iterations: P.iter, hash: "SHA-256" },
+    base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+  const gz = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64(P.iv) }, key, b64(P.data));
+  const stream = new Blob([gz]).stream().pipeThrough(new DecompressionStream("gzip"));
+  const html = await new Response(stream).text();
+  document.open(); document.write(html); document.close();
+}
+
+const f = document.getElementById("f"), pw = document.getElementById("pw"),
+      btn = document.getElementById("btn"), err = document.getElementById("err");
+f.addEventListener("submit", async e => {
+  e.preventDefault();
+  btn.disabled = true; btn.textContent = "解密中…"; err.textContent = "";
+  try { await unlock(pw.value.trim()); }
+  catch { err.textContent = "密码不对"; btn.disabled = false; btn.textContent = "打开"; pw.select(); }
+});
+// 链接里带 #密码 时自动解锁；# 后面的内容不会发给服务器
+const h = decodeURIComponent(location.hash.slice(1));
+if (h) { history.replaceState(null, "", location.pathname); pw.value = h; f.requestSubmit(); }
+</script>
+</body>
+</html>
