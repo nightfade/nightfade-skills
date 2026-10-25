@@ -7,7 +7,7 @@ description: 把 HTML 文档加密后发布到 Cloudflare Pages，生成带密�
 
 HTML 在本机用 AES-256-GCM 加密（PBKDF2-SHA256 60 万次派生密钥，先 gzip 再加密），套进一个自带解密逻辑的页面，发布到 Cloudflare Pages 的随机路径下。对方打开链接、输入密码，在浏览器里解密。Cloudflare 上只有密文。
 
-脚本：`~/.claude/skills/share-html/scripts/share.mjs`，下面用 `share` 代指 `node ~/.claude/skills/share-html/scripts/share.mjs`。
+脚本：`${CLAUDE_PLUGIN_ROOT}/skills/share-html/scripts/share.mjs`，下面用 `share` 代指 `node ${CLAUDE_PLUGIN_ROOT}/skills/share-html/scripts/share.mjs`。
 
 ## 命令
 

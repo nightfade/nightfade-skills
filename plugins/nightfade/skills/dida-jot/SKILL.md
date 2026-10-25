@@ -7,7 +7,7 @@ description: 把用户随手写的想法整理通顺、自动分类后记进滴�
 
 用户的想法往往是随手打的：句子不完整、语序乱、中英混杂、有错别字。这个 skill 负责把它整理成读得懂的笔记，存进滴答「📒随手记」，同时在末尾保留原文，方便以后对照。
 
-脚本：`~/.claude/skills/dida-jot/scripts/jot.mjs`，下面用 `jot` 代指 `node ~/.claude/skills/dida-jot/scripts/jot.mjs`。清单 ID 在同目录的 `config.local.json`（不进仓库，格式见 `config.example.json`）。复用本机 dida CLI 的登录态；报未登录时让用户在终端运行 `! dida auth login`。
+脚本：`${CLAUDE_PLUGIN_ROOT}/skills/dida-jot/scripts/jot.mjs`，下面用 `jot` 代指 `node ${CLAUDE_PLUGIN_ROOT}/skills/dida-jot/scripts/jot.mjs`。清单 ID 在同目录的 `config.local.json`（不进仓库，格式见 `config.example.json`）。复用本机 dida CLI 的登录态；报未登录时让用户在终端运行 `! dida auth login`。
 
 ## 命令
 

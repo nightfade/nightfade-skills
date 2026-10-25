@@ -7,7 +7,7 @@ description: 维护滴答清单「🤖AI Tasks」看板，替用户收纳脑子�
 
 目的是减少注意力切换：念头冒出来先落到清单里，当下不展开；该想的时候再集中处理。
 
-脚本：`~/.claude/skills/dida-tasks/scripts/aitasks.mjs`，下面用 `at` 代指 `node ~/.claude/skills/dida-tasks/scripts/aitasks.mjs`。清单 ID 等本机配置在同目录的 `config.local.json`（不进仓库，格式见 `config.example.json`）。脚本复用本机 dida CLI（`/opt/homebrew/bin/dida`）的登录态；报未登录时让用户在终端运行 `! dida auth login`。
+脚本：`${CLAUDE_PLUGIN_ROOT}/skills/dida-tasks/scripts/aitasks.mjs`，下面用 `at` 代指 `node ${CLAUDE_PLUGIN_ROOT}/skills/dida-tasks/scripts/aitasks.mjs`。清单 ID 等本机配置在同目录的 `config.local.json`（不进仓库，格式见 `config.example.json`）。脚本复用本机 dida CLI（`/opt/homebrew/bin/dida`）的登录态；报未登录时让用户在终端运行 `! dida auth login`。
 
 ## 看板结构
 

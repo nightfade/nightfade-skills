@@ -88,7 +88,7 @@ description: 按 Annie Duke 的决策体系，一步步带用户做一个决定�
 3. 用 dida-tasks 脚本建复盘提醒：
 
 ```bash
-node ~/.claude/skills/dida-tasks/scripts/aitasks.mjs add "复盘决策：<标题>" --col waiting --tags <领域> --due '<复盘日> 10:00' --remind --content "记录在 <决策目录>/记录/<文件名>。到期运行 /annie-decide 复盘 <标题>"
+node ${CLAUDE_PLUGIN_ROOT}/skills/dida-tasks/scripts/aitasks.mjs add "复盘决策：<标题>" --col waiting --tags <领域> --due '<复盘日> 10:00' --remind --content "记录在 <决策目录>/记录/<文件名>。到期运行 /annie-decide 复盘 <标题>"
 ```
 
 领域标签从 `工作` `摄影` `健康` `学习` `生活` `投资` 里选一个。
@@ -117,7 +117,7 @@ node ~/.claude/skills/dida-tasks/scripts/aitasks.mjs add "复盘决策：<标题
 7. 把滴答里对应的「复盘决策：<标题>」标完成：
 
 ```bash
-node ~/.claude/skills/dida-tasks/scripts/aitasks.mjs done "复盘决策：<标题>" --note "<一句话结论>"
+node ${CLAUDE_PLUGIN_ROOT}/skills/dida-tasks/scripts/aitasks.mjs done "复盘决策：<标题>" --note "<一句话结论>"
 ```
 
 ## 记录模板
