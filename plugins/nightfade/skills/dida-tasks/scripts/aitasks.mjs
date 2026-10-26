@@ -8,11 +8,16 @@ import { fileURLToPath } from 'node:url';
 
 // 清单 ID 等本机配置放在 skill 目录的 config.local.json（不进仓库），格式见 config.example.json
 const CFG = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'config.local.json'), 'utf8'));
-const PROJECT = CFG.projectId;
+// --board goals 时操作「🎯目标」清单，否则操作 AI Tasks
+const BOARD = (() => { const i = process.argv.indexOf('--board'); if (i < 0) return 'tasks'; const v = process.argv[i + 1]; process.argv.splice(i, 2); return v; })();
+if (BOARD === 'goals' && !CFG.goalsProjectId) throw new Error('config.local.json 里没有 goalsProjectId');
+const PROJECT = BOARD === 'goals' ? CFG.goalsProjectId : CFG.projectId;
 // 时区：配置里没写就用本机时区
 const TZ = CFG.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone;
 // 列用关键词匹配，列名改了 emoji 也能找到
-const COLUMN_KEYS = { inbox: '收件箱', doing: '进行中', todo: '待办', waiting: '等条件', later: '以后再说', closed: '已完成' };
+const COLUMN_KEYS = BOARD === 'goals'
+  ? { long: '长期', year: '今年', quarter: '本季度', closed: '已达成' }
+  : { inbox: '收件箱', doing: '进行中', todo: '待办', waiting: '等条件', later: '以后再说', closed: '已完成' };
 
 const api = await getApi();
 // 滴答开放接口限速：每分钟 100 次请求。撞到 429 时等 60 秒重试，最多 3 次
@@ -123,7 +128,7 @@ switch (cmd) {
       // --repeat daily|weekly|monthly，或直接给 RRULE
       ...(flags.repeat ? { repeatFlag: ({ daily: 'RRULE:FREQ=DAILY;INTERVAL=1', weekly: 'RRULE:FREQ=WEEKLY;INTERVAL=1', monthly: 'RRULE:FREQ=MONTHLY;INTERVAL=1' })[flags.repeat] ?? flags.repeat } : {}),
     });
-    const col = await columnId(flags.col ?? 'inbox');
+    const col = await columnId(flags.col ?? (BOARD === 'goals' ? 'year' : 'inbox'));
     const u = await api.updateTask(t.id, { id: t.id, projectId: PROJECT, columnId: col });
     out({ id: u.id, title: u.title, columnId: u.columnId, tags: u.tags });
     break;
@@ -170,7 +175,7 @@ switch (cmd) {
   }
   default:
     console.log(`用法：
-  aitasks list
+  aitasks list                       （加 --board goals 操作「🎯目标」清单，列键 long|year|quarter|closed）
   aitasks add <标题> [--content 内容] [--tags 摄影,健康] [--col inbox|doing|todo|waiting|later] [--due '2026-11-15 14:30'] [--remind] [--repeat daily|weekly|monthly]
   aitasks move <任务ID或标题片段> <inbox|doing|todo|waiting|later|closed>
   aitasks edit <任务ID或标题片段> [--title 新标题] [--content 内容] [--tags a,b] [--due '2026-11-15 14:30'|none]

@@ -1,5 +1,6 @@
 {
   "projectId": "<🤖AI Tasks 清单的 ID，用 dida project list 查>",
   "notesTodos": "<个人笔记库里大项目待办文件的路径，可选>",
-  "timeZone": "<可选，IANA 时区名，如 Asia/Shanghai；不填用本机时区>"
+  "timeZone": "<可选，IANA 时区名，如 Asia/Shanghai；不填用本机时区>",
+  "goalsProjectId": "<🎯目标 清单的 ID，可选>"
 }
