@@ -5,9 +5,9 @@ description: 带用户从零开始系统地学一个新领域：定目标、画�
 
 # learn-domain：从零学一个新领域
 
-下文的 `<方法文档>`、`<学习根目录>` 分别指同目录 `config.local.json` 里的 `methodDoc`、`learnRoot`（不进仓库，格式见 `config.example.json`），开始前先读出来。
+下文的 `<学习根目录>` 指同目录 `config.local.json` 里的 `learnRoot`（不进仓库，格式见 `config.example.json`），开始前先读出来。
 
-方法的内容以 `<方法文档>` 为准。开始前先读它；文档和本 skill 冲突时，以文档为准，并提醒用户本 skill 需要同步。
+方法的内容以同目录的 `method.md` 为准。开始前先读它；文档和本 skill 冲突时，以文档为准，并提醒用户本 skill 需要同步。
 
 ## 三种用法
 
@@ -95,7 +95,7 @@ node ${CLAUDE_PLUGIN_ROOT}/skills/dida-tasks/scripts/aitasks.mjs add "学习检�
 ## 检查点
 
 1. 读计划和学习记录
-2. 按方法文档第 5 步的三个问题，逐个问用户：
+2. 按 `method.md` 第 5 步的三个问题，逐个问用户：
    - 在哪个阶段：新手、胜任还是熟练
    - 投入和收获还成比例吗：比较最近和最早的学习记录
    - 目标还对吗
@@ -119,7 +119,7 @@ next_checkpoint: YYYY-MM-DD
 
 # <领域>：学习计划
 
-方法见 `<方法文档的绝对路径>`。
+方法见 learn-domain skill 的 `method.md`。
 
 ## 目标
 
