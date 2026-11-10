@@ -25,6 +25,8 @@ description: 生成一段可以直接贴给 Muse（或其他 AI）的 prompt，�
   - SKILL.md 里以插件根目录变量开头的脚本路径（美元符加花括号包住 CLAUDE_PLUGIN_ROOT，后接 `/skills/`），只有作为 Claude Code 插件安装时才会被替换。不是插件安装的，换成对方自己的 skill 目录。写进 prompt 时，这个变量要按原样写出来
   - 本 skill 正文里不直接写出这个变量，因为 Claude Code 加载 skill 时会把它替换成本机路径
   - 不要覆盖 `config.local.json`，那是本地配置，不在仓库里
+- **先查对方的平台。** skill 依赖特定系统时（比如 macOS 钥匙串、`security` 命令），prompt 里先请对方确认系统；不满足就别装，不要让对方在本地改 SKILL.md 绕过去，本地改动下次同步会被覆盖
+- **验证里的提问由对方代答。** 验证步骤要写明：skill 在测试中问的问题，由对方自己编测试答案代答，不要停下来等用户
 - **验证不碰真实数据。** 要测写操作，先建测试条目，测完删掉；写明用哪条命令删，命令要先在该 skill 的脚本里确认存在
 - **要对方回报。** prompt 结尾请对方列出做了什么、验证结果、和 prompt 描述不一致的地方
 - 仓库是公开的，但 prompt 里会出现清单 ID 这类个人配置值。只在用户要求时把 `config.local.json` 里的值写进去
@@ -48,7 +50,7 @@ git diff <commit>..origin/main -- plugins/nightfade/skills/<skill>/
 
 ## 教新 skill
 
-1. 读该 skill 的 `SKILL.md` 和 `config.example.json`，看依赖：命令行工具、登录、本地配置
+1. 读该 skill 的 `SKILL.md`、`config.example.json` 和它引用的同目录文件，看依赖：命令行工具、登录、本地配置、操作系统。prompt 里提到的格式（表头、模板）要先在文件里找到原文，找不到就不写
 2. 按「新 skill prompt 模板」写：远端该 skill 目录下全部文件的 raw 链接、依赖怎么装、配置怎么填、一句话说这个 skill 做什么、怎么触发
 3. 对方回报成功后，把 skill 加进 `targets.<对象>.skills`，`commit` 记成写 prompt 时的 `origin/main`（`git rev-parse --short origin/main`），`at` 记今天
 
