@@ -7,7 +7,7 @@ description: 按 Annie Duke 的决策体系，一步步带用户做一个决定�
 
 下文的 `<决策目录>` 指同目录 `config.local.json` 里的 `decisionDir`（不进仓库，格式见 `config.example.json`），开始前先读出来。
 
-体系的内容以这份学习文档为准：`<决策目录>/Annie Duke 决策体系.md`。开始前先读它；文档和本 skill 冲突时，以文档为准，并提醒用户本 skill 需要同步。
+体系的内容以同目录的 `method.md` 为准。开始前先读它；文档和本 skill 冲突时，以文档为准，并提醒用户本 skill 需要同步。
 
 ## 文件位置
 
