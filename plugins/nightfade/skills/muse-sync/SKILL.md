@@ -22,7 +22,8 @@ description: 生成一段可以直接贴给 Muse（或其他 AI）的 prompt，�
 - **文件清单以远端为准。** 用 `git ls-tree -r --name-only origin/main plugins/nightfade/skills/<skill>/` 列文件，不要按本地目录列，本地有 `config.local.json` 这类不进仓库的文件
 - **对方的路径对方自己定。** 不假设 Muse 把 skill 装在哪，prompt 里写「你本地的 `<skill>` skill 目录」
 - **一律附这两条提醒：**
-  - SKILL.md 里的 `${CLAUDE_PLUGIN_ROOT}/skills/` 只有作为 Claude Code 插件安装时才会被替换。不是插件安装的，换成对方自己的 skill 目录
+  - SKILL.md 里以插件根目录变量开头的脚本路径（美元符加花括号包住 CLAUDE_PLUGIN_ROOT，后接 `/skills/`），只有作为 Claude Code 插件安装时才会被替换。不是插件安装的，换成对方自己的 skill 目录。写进 prompt 时，这个变量要按原样写出来
+  - 本 skill 正文里不直接写出这个变量，因为 Claude Code 加载 skill 时会把它替换成本机路径
   - 不要覆盖 `config.local.json`，那是本地配置，不在仓库里
 - **验证不碰真实数据。** 要测写操作，先建测试条目，测完删掉；写明用哪条命令删，命令要先在该 skill 的脚本里确认存在
 - **要对方回报。** prompt 结尾请对方列出做了什么、验证结果、和 prompt 描述不一致的地方
@@ -76,7 +77,7 @@ git diff <commit>..origin/main -- plugins/nightfade/skills/<skill>/
 - `<skill>/scripts/<脚本>`：<raw 链接>
 
 注意：
-- SKILL.md 里的 `${CLAUDE_PLUGIN_ROOT}/skills/` 只在 Claude Code 插件安装时才会被替换。你不是这样装的话，换成你自己的 skill 目录
+- <插件根目录变量提醒：按「共同原则」写出原样的变量名>
 - 不要覆盖 `config.local.json`
 
 ## 2. 配置变化
@@ -107,7 +108,7 @@ git diff <commit>..origin/main -- plugins/nightfade/skills/<skill>/
 - <其他文件>：<raw 链接>
 
 注意：
-- SKILL.md 里的 `${CLAUDE_PLUGIN_ROOT}/skills/` 只在 Claude Code 插件安装时才会被替换。你不是这样装的话，换成你自己的 skill 目录
+- <插件根目录变量提醒：按「共同原则」写出原样的变量名>
 - 照 `config.example.json` 新建 `config.local.json`，<各字段怎么填>
 
 ## 2. 依赖
