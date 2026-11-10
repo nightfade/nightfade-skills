@@ -7,6 +7,7 @@
 | dida-tasks | 维护滴答清单里的执行看板和目标清单，收纳杂乱想法、待办，并让执行项对齐目标 |
 | dida-jot | 把零散想法整理通顺、自动分类后记进滴答的笔记清单 |
 | annie-decide | 按 Annie Duke 的决策体系带着做决定、写记录、复盘 |
+| muse-sync | 生成贴给 Muse（或其他 AI）的 prompt，让它从本仓库学会新 skill 或更新已装的 skill，并记下同步进度 |
 | learn-domain | 从零系统地学一个新领域：定目标、画地图、写跨会话的学习计划，检索优先地学，每 4 周检查点 |
 | brainstorming-zh | 中文版头脑风暴：通过结构化对话把模糊想法磨成可执行的设计，不限于代码 |
 | md2pdf | Markdown 转出版风格 PDF（XeLaTeX，支持书籍版式，图表本地转 TikZ，完全离线） |

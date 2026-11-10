@@ -1,0 +1,10 @@
+{
+  "repoDir": "<nightfade-skills 本地克隆的路径>",
+  "targets": {
+    "muse": {
+      "skills": {
+        "<对方已装的 skill 名>": { "commit": "<该 skill 上次同步到的提交>", "at": "YYYY-MM-DD" }
+      }
+    }
+  }
+}
